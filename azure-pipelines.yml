@@ -42,17 +42,10 @@ stages:
       displayName: 'Build docker image'
       inputs:
         mavenPomFile: 'pom.xml'
+        mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
         goals: 'spring-boot:build-image'
         publishJUnitResults: false
         jdkVersionOption: '1.11'
-- stage: 'PUSH'
-  displayName: 'Push to image repo'
-  jobs: 
-  - job: 'Push'
-    displayName: 'Push job'
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
     - task: Docker@2
       displayName:
       inputs:
