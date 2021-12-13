@@ -7,11 +7,11 @@ trigger:
 - main
 
 stages:
-- stage: 'Build'
+- stage: 'BUILD'
   displayName: 'Build the web application'
   jobs: 
   - job: 'Build'
-    displayName: 'Build job'
+    displayName: 'Maven build jar'
     pool: 
       vmImage: 'ubuntu-latest'
     steps:
@@ -25,11 +25,38 @@ stages:
         publishJUnitResults: true
         testResultsFiles: '**/surefire-reports/TEST-*.xml'
         goals: 'package'
-        
+  - job: 'Image'      
+    displayName: 'Maven build image'
+    pool:
+      vmImage: 'ubuntu-image'
+    steps:
     - task: Maven@3
-      displayName: Build Docker image
+      displayName: 'Build docker image'
       inputs:
         mavenPomFile: 'pom.xml'
         goals: 'spring-boot:build-image'
         publishJUnitResults: false
         jdkVersionOption: '1.11'
+
+- stage: 'PUSH'
+  displayName: 'Push to image repo'
+  jobs: 
+  - job: 'Push'
+    displayName: 'Push job'
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: Docker@2
+      displayName:
+      inputs:
+        command: login
+        containerRegistry: reg.lab
+    - task: Docker@2
+      displayName: Push to reg.lab
+      inputs:
+        command: push
+        repository: tkgm/spring-petclinic:2.5.0-SNAPSHOT
+        tags: |
+          test
+
+
