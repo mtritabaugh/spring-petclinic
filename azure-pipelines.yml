@@ -45,7 +45,7 @@ stages:
         mavenOptions: '-Xmx3072m $(MAVEN_OPTS) -Dspring-boot.build-image.imageName=mtritabaugh/spring-petclinic:$(GIT_COMMIT)'
         goals: 'spring-boot:build-image'
         publishJUnitResults: false
-        jdkVersionOption: '1.11'
+        jdkVersionOption: '11'
     - task: Docker@2
       displayName:
       inputs:
