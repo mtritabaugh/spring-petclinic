@@ -6,8 +6,7 @@
 trigger:
 - main
 
-pool:
-  vmImage: tkg-user-pool
+pool: tkg-user-pool
 
 steps:
 - task: Maven@3
