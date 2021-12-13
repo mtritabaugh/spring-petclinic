@@ -38,11 +38,6 @@ stages:
         publishJUnitResults: true
         testResultsFiles: '**/surefire-reports/TEST-*.xml'
         goals: 'package'
-  - job: 'Image'      
-    displayName: 'Maven build image'
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
     - task: Maven@3
       displayName: 'Build docker image'
       inputs:
@@ -50,7 +45,6 @@ stages:
         goals: 'spring-boot:build-image'
         publishJUnitResults: false
         jdkVersionOption: '1.11'
-
 - stage: 'PUSH'
   displayName: 'Push to image repo'
   jobs: 
@@ -68,4 +62,4 @@ stages:
       displayName: Push to reg.lab
       inputs:
         command: push
-        repository: tkgm/spring-petclinic:2.5.0-SNAPSHOT
+        repository: tkgm/spring-petclinic
