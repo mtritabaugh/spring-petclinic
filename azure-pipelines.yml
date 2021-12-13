@@ -41,7 +41,7 @@ stages:
   - job: 'Image'      
     displayName: 'Maven build image'
     pool:
-      vmImage: 'ubuntu-image'
+      vmImage: 'ubuntu-latest'
     steps:
     - task: Maven@3
       displayName: 'Build docker image'
@@ -71,5 +71,3 @@ stages:
         repository: tkgm/spring-petclinic:2.5.0-SNAPSHOT
         tags: |
           test
-
-
