@@ -42,7 +42,7 @@ stages:
       displayName: 'Build docker image'
       inputs:
         mavenPomFile: 'pom.xml'
-        mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
+        mavenOptions: '-Xmx3072m $(MAVEN_OPTS) -Dspring-boot.build-image.imageName=mtritaba.com:8443/tkgm/spring-petclinic:latest'
         goals: 'spring-boot:build-image'
         publishJUnitResults: false
         jdkVersionOption: '1.11'
@@ -56,3 +56,5 @@ stages:
       inputs:
         command: push
         repository: tkgm/spring-petclinic
+        tags:
+          latest
