@@ -17,8 +17,7 @@ stages:
   jobs: 
   - job: 'Build'
     displayName: 'Maven build jar'
-    pool: 
-      vmImage: 'ubuntu-latest'
+    pool: 'tkg-user-pool'
     steps:
     - task: Cache@2
       inputs:
