@@ -9,7 +9,7 @@ trigger:
 variables:
   MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
   MAVEN_OPTS: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
-  GIT_COMMIT: 'Build.SourceVersion'
+  GIT_COMMIT: $(Build.SourceVersion)
 
 stages:
 - stage: 'BUILD'
