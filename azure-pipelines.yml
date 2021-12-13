@@ -69,5 +69,3 @@ stages:
       inputs:
         command: push
         repository: tkgm/spring-petclinic:2.5.0-SNAPSHOT
-        tags: |
-          test
