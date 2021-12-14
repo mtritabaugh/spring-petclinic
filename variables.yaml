@@ -1,0 +1,5 @@
+variables:
+- name: CLUSTER
+  value: tkgm1-cluster1
+- name: APP
+  value: petclinic

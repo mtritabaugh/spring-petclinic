@@ -14,6 +14,7 @@ variables:
 - name: GIT_COMMIT
   value: $(Build.SourceVersion)
 - group: ARGOCD_LAB
+- template: variables.yaml
 
 stages:
 - stage: 'BUILD'
@@ -72,6 +73,6 @@ stages:
     pool:  'tkg-user-pool'
     steps:
     - script: argocd login 192.168.31.33 --username $(ARGOCD_ADMIN) --password $(ARGOCD_PASSWORD) --insecure
-      displayName: 'argocd app login'
-    - script: argocd app set petclinic-dev -p image.tag=$(GIT_COMMIT)
+      displayName: 'argocd argocd.apps.$(CLUSTER) login'
+    - script: argocd app set $(APP)-dev -p image.tag=$(GIT_COMMIT)
       displayName: 'argo set image tag'
