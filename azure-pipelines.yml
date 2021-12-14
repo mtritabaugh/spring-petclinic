@@ -61,7 +61,7 @@ stages:
         tags: |
           $(GIT_COMMIT)
 
-- stage: 'DEPLOY DEV'
+- stage: 'DEPLOY_DEV'
   displayName: 'Deploy to Dev'
   jobs: 
   - job: 'argocd'
