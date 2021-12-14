@@ -7,10 +7,13 @@ trigger:
 - main
 
 variables:
-  MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
-  MAVEN_OPTS: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
-  GIT_COMMIT: $(Build.SourceVersion)
-  group: ARGOCD_LAB
+- name: MAVEN_CACHE_FOLDER
+  value: $(Pipeline.Workspace)/.m2/repository
+- name: MAVEN_OPTS
+  value: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
+- name: GIT_COMMIT
+  value: $(Build.SourceVersion)
+- group: ARGOCD_LAB
 
 stages:
 - stage: 'BUILD'
@@ -68,7 +71,7 @@ stages:
     displayName: 'argocd app set job'
     pool:  'tkg-user-pool'
     steps:
-    - script: argocd login 192.168.31.33 --username $(ARGOCD_ADMIN) --password $(ARGOCD_PASSWORD)
+    - script: argocd login 192.168.31.33 --username $(ARGOCD_ADMIN) --password $(ARGOCD_PASSWORD) --insecure
       displayName: 'argocd app login'
     - script: argocd app set petclinic-dev -p image.tag=$(GIT_COMMIT)
       displayName: 'argo set image tag'
