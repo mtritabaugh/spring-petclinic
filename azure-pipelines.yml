@@ -73,10 +73,10 @@ stages:
     displayName: 'argocd set image tag'
     pool:  'tkg-user-pool'
     steps:
-    - displayName: 'argocd login'
-      script: argocd login argocd.apps.$(CLUSTER) --username $(ARGOCD_ADMIN) --password $(ARGOCD_PASSWORD) --insecure
-    - displayName: 'argo set image tag'
-      script: argocd app set $(APP)-dev -p image.tag=$(GIT_COMMIT)
+    - script: argocd login argocd.apps.$(CLUSTER) --username $(ARGOCD_ADMIN) --password $(ARGOCD_PASSWORD) --insecure
+      displayName: 'argocd login'
+    - script: argocd app set $(APP)-dev -p image.tag=$(GIT_COMMIT)
+      displayName: 'argo set image tag'
 
 - stage: 'DEPLOY_PROD'
   displayName: 'Deploy to Prod'
@@ -85,7 +85,7 @@ stages:
     displayName: 'argocd set image tag'
     pool:  'tkg-user-pool'
     steps:
-    - displayName: 'argocd login'
-      script: argocd login argocd.apps.$(CLUSTER) --username $(ARGOCD_ADMIN) --password $(ARGOCD_PASSWORD) --insecure
-    - displayName: 'argo set image tag'
-      script: argocd app set $(APP)-prod -p image.tag=$(GIT_COMMIT)
+    - script: argocd login argocd.apps.$(CLUSTER) --username $(ARGOCD_ADMIN) --password $(ARGOCD_PASSWORD) --insecure
+      displayName: 'argocd login'
+    - script: argocd app set $(APP)-prod -p image.tag=$(GIT_COMMIT)
+      displayName: 'argo set image tag'
