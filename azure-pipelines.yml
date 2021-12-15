@@ -21,20 +21,21 @@ stages:
   displayName: 'Build the web application'
   jobs: 
   - job: 'Build'
-    displayName: 'Maven build jar'
+    displayName: 'Build Application Image'
     pool: 
       vmImage: 'ubuntu-latest'
     steps:
     - task: Cache@2
+      displayName: 'Cache Maven local repo'
       inputs:
         key: 'maven | "$(Agent.OS)" | **/pom.xml'
         restoreKeys: |
           maven | "$(Agent.OS)"
           maven
         path: $(MAVEN_CACHE_FOLDER)
-      displayName: Cache Maven local repo
     - script: mvn install -B -e
     - task: Maven@3
+      displayName: 'maven package'
       inputs:
         mavenPomFile: 'pom.xml'
         mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
@@ -53,12 +54,12 @@ stages:
         publishJUnitResults: false
         jdkVersionOption: '11'
     - task: Docker@2
-      displayName:
+      displayName: 'Registry login'
       inputs:
         command: login
         containerRegistry: dockerhub
     - task: Docker@2
-      displayName: Push to dockerhub
+      displayName: 'Push to registry'
       inputs:
         command: push
         repository: mtritabaugh/spring-petclinic
@@ -68,11 +69,23 @@ stages:
 - stage: 'DEPLOY_DEV'
   displayName: 'Deploy to Dev'
   jobs: 
-  - job: 'argocd'
-    displayName: 'argocd app set job'
+  - job: 'argocd_app_set'
+    displayName: 'argocd set image tag'
     pool:  'tkg-user-pool'
     steps:
-    - script: argocd login argocd.apps.$(CLUSTER) --username $(ARGOCD_ADMIN) --password $(ARGOCD_PASSWORD) --insecure
-      displayName: 'argocd argocd.apps.$(CLUSTER) login'
-    - script: argocd app set $(APP)-dev -p image.tag=$(GIT_COMMIT)
-      displayName: 'argo set image tag'
+    - displayName: 'argocd login'
+      script: argocd login argocd.apps.$(CLUSTER) --username $(ARGOCD_ADMIN) --password $(ARGOCD_PASSWORD) --insecure
+    - displayName: 'argo set image tag'
+      script: argocd app set $(APP)-dev -p image.tag=$(GIT_COMMIT)
+
+- stage: 'DEPLOY_PROD'
+  displayName: 'Deploy to Prod'
+  jobs: 
+  - job: 'argocd_app_set'
+    displayName: 'argocd set image tag'
+    pool:  'tkg-user-pool'
+    steps:
+    - displayName: 'argocd login'
+      script: argocd login argocd.apps.$(CLUSTER) --username $(ARGOCD_ADMIN) --password $(ARGOCD_PASSWORD) --insecure
+    - displayName: 'argo set image tag'
+      script: argocd app set $(APP)-prod -p image.tag=$(GIT_COMMIT)
