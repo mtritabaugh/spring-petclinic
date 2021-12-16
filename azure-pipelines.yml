@@ -79,7 +79,7 @@ stages:
       displayName: 'argo set image tag'
 
 - stage: 'APPROVAL'
-  displayname: "Approval for Prod"
+  displayName: "Approval for Prod"
   jobs:
   - job: waitForValidation
     displayName: Wait for external validation  
