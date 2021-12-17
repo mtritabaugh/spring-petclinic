@@ -10,66 +10,66 @@ variables:
   value: $(Pipeline.Workspace)/.m2/repository
 - name: MAVEN_OPTS
   value: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
-- name: GIT_COMMIT
-  value: $(Build.SourceVersion)
+  #- name: GIT_COMMIT
+  #value: $(Build.SourceVersion)
 - group: ARGOCD_LAB
 - template: variables.yaml
 
 resources:
   webhooks:
-    - webhook: dockerhub-webhook
+    - webhook: tkg-user
       connection: dockerhub-webhook
 
 stages:
-- stage: 'BUILD'
-  displayName: 'Build the web application'
-  jobs: 
-  - job: 'Build'
-    displayName: 'Build Application Image'
-    pool: 
-      vmImage: 'ubuntu-latest'
-    steps:
-    - task: Cache@2
-      displayName: 'Cache Maven local repo'
-      inputs:
-        key: 'maven | "$(Agent.OS)" | **/pom.xml'
-        restoreKeys: |
-          maven | "$(Agent.OS)"
-          maven
-        path: $(MAVEN_CACHE_FOLDER)
-    - script: mvn install -B -e
-    - task: Maven@3
-      displayName: 'maven package'
-      inputs:
-        mavenPomFile: 'pom.xml'
-        mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
-        javaHomeOption: 'JDKVersion'
-        jdkVersionOption: '1.11'
-        jdkArchitectureOption: 'x64'
-        publishJUnitResults: true
-        testResultsFiles: '**/surefire-reports/TEST-*.xml'
-        goals: 'package'
-    - task: Maven@3
-      displayName: 'Build docker image'
-      inputs:
-        mavenPomFile: 'pom.xml'
-        mavenOptions: '-Xmx3072m $(MAVEN_OPTS) -Dspring-boot.build-image.imageName=mtritabaugh/spring-petclinic:$(GIT_COMMIT)'
-        goals: 'spring-boot:build-image'
-        publishJUnitResults: false
-        jdkVersionOption: '11'
-    - task: Docker@2
-      displayName: 'Registry login'
-      inputs:
-        command: login
-        containerRegistry: dockerhub
-    - task: Docker@2
-      displayName: 'Push to registry'
-      inputs:
-        command: push
-        repository: mtritabaugh/spring-petclinic
-        tags: |
-          $(GIT_COMMIT)
-
+  #- stage: 'BUILD'
+  #  displayName: 'Build the web application'
+  #jobs: 
+  #- job: 'Build'
+  #  displayName: 'Build Application Image'
+  #  pool: 
+  #    vmImage: 'ubuntu-latest'
+  #  steps:
+  #  - task: Cache@2
+  #    displayName: 'Cache Maven local repo'
+  #    inputs:
+  #      key: 'maven | "$(Agent.OS)" | **/pom.xml'
+  #      restoreKeys: |
+  #        maven | "$(Agent.OS)"
+  #        maven
+  #      path: $(MAVEN_CACHE_FOLDER)
+  #  - script: mvn install -B -e
+  #  - task: Maven@3
+  #    displayName: 'maven package'
+  #    inputs:
+  #      mavenPomFile: 'pom.xml'
+  #      mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
+  #      javaHomeOption: 'JDKVersion'
+  #      jdkVersionOption: '1.11'
+  #      jdkArchitectureOption: 'x64'
+  #      publishJUnitResults: true
+  #      testResultsFiles: '**/surefire-reports/TEST-*.xml'
+  #      goals: 'package'
+  #  - task: Maven@3
+  #    displayName: 'Build docker image'
+  #    inputs:
+  #      mavenPomFile: 'pom.xml'
+  #      mavenOptions: '-Xmx3072m $(MAVEN_OPTS) -Dspring-boot.build-image.imageName=mtritabaugh/spring-petclinic:${{ parameters.tkg-user.pushdata.tag}}'
+  #      goals: 'spring-boot:build-image'
+  #      publishJUnitResults: false
+  #      jdkVersionOption: '11'
+  #  - task: Docker@2
+  #    displayName: 'Registry login'
+  #    inputs:
+  #      command: login
+  #      containerRegistry: dockerhub
+  #  - task: Docker@2
+  #    displayName: 'Push to registry'
+  #    inputs:
+  #      command: push
+  #      repository: mtritabaugh/spring-petclinic
+  #      tags: |
+  #        $(GIT_COMMIT)
+  #
 - stage: 'DEPLOY_DEV'
   displayName: 'Deploy to Dev'
   jobs: 
@@ -79,7 +79,7 @@ stages:
     steps:
     - script: argocd login argocd.apps.$(CLUSTER) --username $(ARGOCD_ADMIN) --password $(ARGOCD_PASSWORD) --insecure
       displayName: 'argocd login'
-    - script: argocd app set $(APP)-dev -p image.tag=${{ parameters.dockerhub-webhook.pushdata.tag}}
+    - script: argocd app set $(APP)-dev -p image.tag=${{ parameters.tkg-user.pushdata.tag}}
       displayName: 'argo set image tag'
 
 - stage: 'APPROVAL'
