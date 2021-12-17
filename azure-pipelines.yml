@@ -3,8 +3,7 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-trigger:
-- main
+trigger: none
 
 variables:
 - name: MAVEN_CACHE_FOLDER
@@ -15,6 +14,11 @@ variables:
   value: $(Build.SourceVersion)
 - group: ARGOCD_LAB
 - template: variables.yaml
+
+resources:
+  webhooks:
+    - webhook: dockerhub-webhook
+      connection: dockerhub-webhook
 
 stages:
 - stage: 'BUILD'
@@ -75,7 +79,7 @@ stages:
     steps:
     - script: argocd login argocd.apps.$(CLUSTER) --username $(ARGOCD_ADMIN) --password $(ARGOCD_PASSWORD) --insecure
       displayName: 'argocd login'
-    - script: argocd app set $(APP)-dev -p image.tag=$(GIT_COMMIT)
+    - script: argocd app set $(APP)-dev -p image.tag=${{ parameters.dockerhub-webhook.pushdata.tag}}
       displayName: 'argo set image tag'
 
 - stage: 'APPROVAL'
