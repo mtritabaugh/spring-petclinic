@@ -17,8 +17,8 @@ variables:
 
 resources:
   webhooks:
-    - webhook: tkg-user
-      connection: dockerhub-webhook
+    - webhook: dwh
+      connection: dwhservice
 
 stages:
   #- stage: 'BUILD'
@@ -79,7 +79,7 @@ stages:
     steps:
     - script: argocd login argocd.apps.$(CLUSTER) --username $(ARGOCD_ADMIN) --password $(ARGOCD_PASSWORD) --insecure
       displayName: 'argocd login'
-    - script: argocd app set $(APP)-dev -p image.tag=${{ parameters.tkg-user.pushdata.tag}}
+    - script: argocd app set $(APP)-dev -p image.tag=${{ parameters.dwh.push_data.tag}}
       displayName: 'argo set image tag'
 
 - stage: 'APPROVAL'
